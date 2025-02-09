@@ -36,8 +36,8 @@ class MyService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        log("onDestroy")
         coroutineScope.cancel()
+        log("onDestroy")
     }
 
     override fun onBind(p0: Intent?): IBinder? {
