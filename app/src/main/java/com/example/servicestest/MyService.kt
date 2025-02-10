@@ -53,7 +53,7 @@ class MyService : Service() {
         private const val EXTRA_START = "start"
 
         fun newIntent(context: Context, start: Int): Intent {
-            return Intent(context, MyService::class.java).apply {
+            return Intent(context, MyForegroundService::class.java).apply {
                 putExtra(EXTRA_START, start)
             }
         }
