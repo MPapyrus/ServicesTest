@@ -1,5 +1,6 @@
 package com.example.servicestest
 
+import android.annotation.SuppressLint
 import android.app.IntentService
 import android.app.Notification
 import android.app.NotificationChannel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 
 class MyIntentService : IntentService(NAME) {
 
+    @SuppressLint("ForegroundServiceType")
     override fun onCreate() {
         super.onCreate()
         log("onCreate")
@@ -26,7 +28,7 @@ class MyIntentService : IntentService(NAME) {
 //        setIntentRedelivery() true or false. false = START_NOT_STICKY true = START_REDELIVERY_INTENT
 
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotification())!!
+        startForeground(NOTIFICATION_ID, createNotification())
     }
 
     override fun onHandleIntent(p0: Intent?) {
