@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,7 +20,7 @@
         <service android:name=".MyService"/>
         <service android:name=".MyForegroundService"/>
         <service android:name=".MyIntentService"/>
-
+        <service android:name=".MyJobService" android:permission="android.permission.BIND_JOB_SERVICE"/>
 
 
         <activity
