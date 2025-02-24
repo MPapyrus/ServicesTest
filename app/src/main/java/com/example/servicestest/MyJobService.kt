@@ -5,7 +5,9 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
+import android.os.PersistableBundle
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,17 +29,24 @@ class MyJobService : JobService() {
         return true // true если запланирован на выполнение после уничтожения
     }
 
-    override fun onStartJob(p0: JobParameters?): Boolean {
-        log("onStartJob")
+    override fun onStartJob(params: JobParameters?): Boolean {
+        log("onStartCommand")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            coroutineScope.launch {
+                var workItem = params?.dequeueWork()
+                while (workItem != null) {
+                    val page = workItem.intent.getIntExtra(PAGE, 0)
 
-        coroutineScope.launch {
-            for (i in 0 until 100) {
-                delay(1000)
-                log("Timer: $i")
+                    for (i in 0 until 5) {
+                        delay(1000)
+                        log("Timer $i $page")
+                    }
+                    params?.completeWork(workItem)
+                    workItem = params?.dequeueWork()
+                }
+                jobFinished(params, false)
             }
-            jobFinished(p0, false) // Сообщаем системе, что задача завершена. Не будет перезапущена.
         }
-
         return true
     }
 
@@ -54,6 +63,13 @@ class MyJobService : JobService() {
     companion object {
 
         const val JOB_ID = 111
+        private const val PAGE = "page"
+
+        fun newIntent(page: Int): Intent {
+            return Intent().apply {
+                putExtra(PAGE, page)
+            }
+        }
     }
 
 }
