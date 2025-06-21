@@ -20,12 +20,21 @@ class MyForegroundService : Service() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    private val notificationBuilder by lazy {
+        createNotificationBuilder()
+    }
+
+    private val notificationManager by lazy {
+        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+
     override fun onCreate() {
         super.onCreate()
         log("onCreate")
 
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotification())
+        startForeground(NOTIFICATION_ID, notificationBuilder.build())
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -33,8 +42,14 @@ class MyForegroundService : Service() {
 
 
         coroutineScope.launch {
-            for (i in 0 until 100) {
+            for (i in 0..100 step 5) {
                 delay(1000)
+                val notification = notificationBuilder
+                    .setProgress(100, i, false)
+                    .build()
+
+                notificationManager.notify(NOTIFICATION_ID, notification)
+
                 log("Timer: $i")
             }
             stopSelf() // останавливает себя внутри сервиса
@@ -53,7 +68,6 @@ class MyForegroundService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
                 CHANNEL_ID,
@@ -64,11 +78,12 @@ class MyForegroundService : Service() {
         }
     }
 
-    private fun createNotification() = NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun createNotificationBuilder() = NotificationCompat.Builder(this, CHANNEL_ID)
         .setContentTitle("Title")
         .setContentText("Text")
         .setSmallIcon(R.drawable.ic_launcher_background)
-        .build()
+        .setProgress(100, 0, false)
+        .setOnlyAlertOnce(true)
 
     private fun log(message: String) {
         Log.d("SERVICE_TAG", "MyForegroundService: $message")
